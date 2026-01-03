@@ -1,0 +1,37 @@
+name: Non-Release Build
+on:
+  workflow_dispatch:
+    branches:
+
+jobs:
+  build:
+
+    name: Build
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+
+      - name: Create artifact name
+        run: |
+          echo "ARTIFACT=rtk_libs" >> $GITHUB_ENV
+
+      - name: Run Dockerfile and copy files
+        run: |
+          docker build -t arduino_lib_builder --progress=plain --no-cache .
+          docker create --name=arduino_lib_builder_esp32 arduino_lib_builder:latest
+          mkdir ./${{ env.ARTIFACT }}
+          docker cp arduino_lib_builder_esp32:/libbt.a ./${{ env.ARTIFACT }}
+          docker cp arduino_lib_builder_esp32:/libmbedcrypto.a ./${{ env.ARTIFACT }}
+          docker cp arduino_lib_builder_esp32:/libmbedtls.a ./${{ env.ARTIFACT }}
+          docker cp arduino_lib_builder_esp32:/libmbedtls_2.a ./${{ env.ARTIFACT }}
+          docker cp arduino_lib_builder_esp32:/libmbedx509.a ./${{ env.ARTIFACT }}
+          docker container rm arduino_lib_builder_esp32
+
+      - name: Upload artifact directory to action - avoid double-zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT }}
+          path: ./${{ env.ARTIFACT }}
+          retention-days: 7
