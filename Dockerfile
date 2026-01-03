@@ -49,7 +49,7 @@ RUN : \
 
 ARG LIBBUILDER_CLONE_URL=https://github.com/espressif/esp32-arduino-lib-builder
 ARG LIBBUILDER_CLONE_BRANCH_OR_TAG=release/v5.1
-ARG LIBBUILDER_CHECKOUT_REF=
+ARG LIBBUILDER_CHECKOUT_REF=802f843
 ARG LIBBUILDER_CLONE_SHALLOW=
 ARG LIBBUILDER_CLONE_SHALLOW_DEPTH=1
 
@@ -75,11 +75,9 @@ RUN echo LIBBUILDER_CHECKOUT_REF=$LIBBUILDER_CHECKOUT_REF LIBBUILDER_CLONE_BRANC
 
 COPY entrypoint.sh $LIBBUILDER_PATH/entrypoint.sh
 
-# Install the IDF, here in upstream, to avoid doing it each time in deployment
+# Build for ESP32 with QIO Flash at 80MHz. Always "exit 0" - even if compilation fails
 RUN cd $LIBBUILDER_PATH \
-  && ./tools/update-components.sh \
-  && ./tools/install-arduino.sh \
-  && source ./tools/install-esp-idf.sh
+  && ./build.sh -t esp32 -b build -A release/v3.0.x -I release/v5.1 -i 632e0c2a qio 80m; exit 0
 
 # ========== Patch and build the library binaries ==========
 
@@ -105,7 +103,7 @@ RUN sed -i 's|esp_timer_impl_update_apb_freq(apb|//esp_timer_impl_update_apb_fre
 
 # Build for ESP32 with QIO Flash at 80MHz. Always "exit 0" - even if compilation fails
 RUN cd $LIBBUILDER_PATH \
-  && ./build.sh -t esp32 -b build qio 80m; exit 0
+  && ./build.sh -t esp32 -b build -A release/v3.0.x -I release/v5.1 -i 632e0c2a qio 80m; exit 0
 
 # ========== Copy the library binaries to the root folder ==========
 
