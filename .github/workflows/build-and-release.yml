@@ -1,0 +1,93 @@
+name: Build and Release
+on:
+  workflow_dispatch:
+    branches:
+
+jobs:
+  build:
+
+    name: Build
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+
+      - name: Create artifact name
+        run: |
+          echo "ARTIFACT=rtk_libs" >> $GITHUB_ENV
+
+      - name: Run Dockerfile and copy files
+        run: |
+          docker build -t arduino_lib_builder --progress=plain --no-cache .
+          docker create --name=arduino_lib_builder_esp32 arduino_lib_builder:latest
+          mkdir ./${{ env.ARTIFACT }}
+          docker cp arduino_lib_builder_esp32:/libbt.a ./${{ env.ARTIFACT }}
+          docker cp arduino_lib_builder_esp32:/libmbedcrypto.a ./${{ env.ARTIFACT }}
+          docker cp arduino_lib_builder_esp32:/libmbedtls.a ./${{ env.ARTIFACT }}
+          docker cp arduino_lib_builder_esp32:/libmbedtls_2.a ./${{ env.ARTIFACT }}
+          docker cp arduino_lib_builder_esp32:/libmbedx509.a ./${{ env.ARTIFACT }}
+          docker container rm arduino_lib_builder_esp32
+
+      # TODO: replace this with a strategy and matrix
+
+      - name: Push libbt.a to SparkFun RTK Everywhere
+        # uses: dmnemec/copy_file_to_another_repo_action #Workaround for Issue: https://github.com/orgs/community/discussions/55820#discussioncomment-5946136
+        uses: Jason2866/copy_file_to_another_repo_action@http408_fix
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.PUSH_FIRMWARE_REPO }}
+        with:
+          source_file: ./${{ env.ARTIFACT }}/libbt.a
+          destination_repo: 'sparkfun/SparkFun_RTK_Everywhere_Firmware'
+          destination_folder: 'Firmware/RTK_Everywhere/Patch'
+          user_email: 'nathan@sparkfun.com'
+          user_name: 'nseidle'
+          commit_message: 'Github Action - Updating libbt.a'
+
+      - name: Push libmbedcrypto.a to SparkFun RTK Everywhere
+        uses: Jason2866/copy_file_to_another_repo_action@http408_fix
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.PUSH_FIRMWARE_REPO }}
+        with:
+          source_file: ./${{ env.ARTIFACT }}/libmbedcrypto.a
+          destination_repo: 'sparkfun/SparkFun_RTK_Everywhere_Firmware'
+          destination_folder: 'Firmware/RTK_Everywhere/Patch'
+          user_email: 'nathan@sparkfun.com'
+          user_name: 'nseidle'
+          commit_message: 'Github Action - Updating libmbedcrypto.a'
+
+      - name: Push libmbedtls.a to SparkFun RTK Everywhere
+        uses: Jason2866/copy_file_to_another_repo_action@http408_fix
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.PUSH_FIRMWARE_REPO }}
+        with:
+          source_file: ./${{ env.ARTIFACT }}/libmbedtls.a
+          destination_repo: 'sparkfun/SparkFun_RTK_Everywhere_Firmware'
+          destination_folder: 'Firmware/RTK_Everywhere/Patch'
+          user_email: 'nathan@sparkfun.com'
+          user_name: 'nseidle'
+          commit_message: 'Github Action - Updating libmbedtls.a'
+
+      - name: Push libmbedtls_2.a to SparkFun RTK Everywhere
+        uses: Jason2866/copy_file_to_another_repo_action@http408_fix
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.PUSH_FIRMWARE_REPO }}
+        with:
+          source_file: ./${{ env.ARTIFACT }}/libmbedtls_2.a
+          destination_repo: 'sparkfun/SparkFun_RTK_Everywhere_Firmware'
+          destination_folder: 'Firmware/RTK_Everywhere/Patch'
+          user_email: 'nathan@sparkfun.com'
+          user_name: 'nseidle'
+          commit_message: 'Github Action - Updating libmbedtls_2.a'
+
+      - name: Push libmbedx509.a to SparkFun RTK Everywhere
+        uses: Jason2866/copy_file_to_another_repo_action@http408_fix
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.PUSH_FIRMWARE_REPO }}
+        with:
+          source_file: ./${{ env.ARTIFACT }}/libmbedx509.a
+          destination_repo: 'sparkfun/SparkFun_RTK_Everywhere_Firmware'
+          destination_folder: 'Firmware/RTK_Everywhere/Patch'
+          user_email: 'nathan@sparkfun.com'
+          user_name: 'nseidle'
+          commit_message: 'Github Action - Updating libmbedx509.a'
