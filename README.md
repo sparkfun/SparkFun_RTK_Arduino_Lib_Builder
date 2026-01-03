@@ -50,7 +50,7 @@ Here is a checklist for how to compile the libraries locally. We tend to use Win
 
 This repo includes two [Workflows](./.github/workflows) which will run the same [Dockerfile](./Dockerfile) under a GitHub Action
 
-[non-release-build.yml](./.github/workflows/non-release-build.yml) will build the libraries and attach them to the Action as Assets
+[non-release-build.yml](./.github/workflows/non-release-build.yml) will build the libraries and attach them to the Action as a Zip file Asset
 
 [build-and-release.yml](./.github/workflows/build-and-release.yml) will build the libraries and push them to the [SparkFun_RTK_Everywhere_Firmware](https://github.com/sparkfun/SparkFun_RTK_Everywhere_Firmware) repo, in the [Patch folder](https://github.com/sparkfun/SparkFun_RTK_Everywhere_Firmware/tree/main/Firmware/RTK_Everywhere/Patch). This is for SparkFun use only. If you have cloned or forked this repo, this Action won't work for you - you won't have the correct permissions to push the libraries.
 
