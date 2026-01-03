@@ -62,7 +62,7 @@ The build currently fails with the error:
 /opt/esp/lib-builder/components/arduino/cores/esp32/esp32-hal-cpu.c:170: undefined reference to esp_timer_impl_update_apb_freq
 ```
 
-We need to understand why that is happening and correct it. If you can help, please [open an issue](https://github.com/sparkfun/SparkFun_RTK_Arduino_Lib_Builder/issues). Thanks!
+We need to understand why that is happening and correct it. Our nasty workaround is to comment the call to ```esp_timer_impl_update_apb_freq```. If you can tell us the correct way to fix this, please [open an issue](https://github.com/sparkfun/SparkFun_RTK_Arduino_Lib_Builder/issues). Thanks!
 
 
 * Your friends at SparkFun

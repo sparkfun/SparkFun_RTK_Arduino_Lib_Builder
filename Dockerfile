@@ -97,6 +97,12 @@ COPY defconfig.esp32 $LIBBUILDER_PATH/configs/defconfig.esp32
 RUN sed -i 's|ARRAY_TO_BE_STREAM|ARRAY_TO_BE_STREAM_REVERSE|g' \
   $LIBBUILDER_PATH/esp-idf/components/bt/host/bluedroid/btc/profile/std/sdp/btc_sdp.c
 
+# Fix the compilation error in esp32-hal-cpu.c
+RUN sed -i 's|void esp_timer_impl_update_apb_freq|//void esp_timer_impl_update_apb_freq|g' \
+  $LIBBUILDER_PATH/components/arduino/cores/esp32/esp32-hal-cpu.c
+RUN sed -i 's|esp_timer_impl_update_apb_freq(apb|//esp_timer_impl_update_apb_freq(apb|g' \
+  $LIBBUILDER_PATH/components/arduino/cores/esp32/esp32-hal-cpu.c
+
 # Build for ESP32 with QIO Flash at 80MHz. Always "exit 0" - even if compilation fails
 RUN cd $LIBBUILDER_PATH \
   && ./build.sh -t esp32 -b build qio 80m; exit 0
