@@ -2,7 +2,7 @@
 
 FROM ubuntu:22.04 AS upstream
 
-# switch to root, let the entrypoint drop back to host user
+# switch to root
 USER root
 SHELL ["/bin/bash", "-c"]
 
@@ -47,11 +47,16 @@ RUN : \
 # Use LIBBUILDER_CLONE_SHALLOW=1 to peform shallow clone (i.e. --depth=1 --shallow-submodules)
 # Use LIBBUILDER_CLONE_SHALLOW_DEPTH=X to define the depth if LIBBUILDER_CLONE_SHALLOW is used (i.e. --depth=X)
 
+# We need to specify the branch and the correct commit for both lib-builder and the esp-idf
+# https://github.com/espressif/arduino-esp32/pull/10454
 ARG LIBBUILDER_CLONE_URL=https://github.com/espressif/esp32-arduino-lib-builder
 ARG LIBBUILDER_CLONE_BRANCH_OR_TAG=release/v5.1
 ARG LIBBUILDER_CHECKOUT_REF=802f843
 ARG LIBBUILDER_CLONE_SHALLOW=
 ARG LIBBUILDER_CLONE_SHALLOW_DEPTH=1
+ARG ESP_IDF_BRANCH=release/v5.1
+ARG ESP_IDF_COMMIT=632e0c2a
+ARG ARDUINO_ESP32_BRANCH=release/v3.0.x
 
 ENV LIBBUILDER_PATH=/opt/esp/lib-builder
 # Ccache is installed, enable it by default
@@ -73,11 +78,9 @@ RUN echo LIBBUILDER_CHECKOUT_REF=$LIBBUILDER_CHECKOUT_REF LIBBUILDER_CLONE_BRANC
     fi && \
     pip3 install --upgrade -r $LIBBUILDER_PATH/tools/config_editor/requirements.txt
 
-COPY entrypoint.sh $LIBBUILDER_PATH/entrypoint.sh
-
-# Build for ESP32 with QIO Flash at 80MHz. Always "exit 0" - even if compilation fails
+# Build for ESP32 with QIO Flash at 80MHz. This installs everything. Always "exit 0" - even if compilation fails
 RUN cd $LIBBUILDER_PATH \
-  && ./build.sh -t esp32 -b build -A release/v3.0.x -I release/v5.1 -i 632e0c2a qio 80m; exit 0
+  && ./build.sh -t esp32 -b build -A $ARDUINO_ESP32_BRANCH -I $ESP_IDF_BRANCH -i $ESP_IDF_COMMIT qio 80m; exit 0
 
 # ========== Patch and build the library binaries ==========
 
@@ -101,9 +104,9 @@ RUN sed -i 's|void esp_timer_impl_update_apb_freq|//void esp_timer_impl_update_a
 RUN sed -i 's|esp_timer_impl_update_apb_freq(apb|//esp_timer_impl_update_apb_freq(apb|g' \
   $LIBBUILDER_PATH/components/arduino/cores/esp32/esp32-hal-cpu.c
 
-# Build for ESP32 with QIO Flash at 80MHz. Always "exit 0" - even if compilation fails
+# Re-build for ESP32 using the modified files. Always "exit 0" - even if compilation fails
 RUN cd $LIBBUILDER_PATH \
-  && ./build.sh -t esp32 -b build -A release/v3.0.x -I release/v5.1 -i 632e0c2a qio 80m; exit 0
+  && ./build.sh -t esp32 -b build -A $ARDUINO_ESP32_BRANCH -I $ESP_IDF_BRANCH -i $ESP_IDF_COMMIT qio 80m; exit 0
 
 # ========== Copy the library binaries to the root folder ==========
 
@@ -114,4 +117,5 @@ COPY --from=deployment .$LIBBUILDER_PATH/build/esp-idf/mbedtls/libmbedtls.a /
 COPY --from=deployment .$LIBBUILDER_PATH/build/esp-idf/mbedtls/mbedtls/library/libmbedcrypto.a /
 COPY --from=deployment .$LIBBUILDER_PATH/build/esp-idf/mbedtls/mbedtls/library/libmbedtls.a /libmbedtls_2.a
 COPY --from=deployment .$LIBBUILDER_PATH/build/esp-idf/mbedtls/mbedtls/library/libmbedx509.a /
+
 CMD echo $(ls /*.*)
