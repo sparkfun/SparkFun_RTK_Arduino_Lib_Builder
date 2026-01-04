@@ -45,6 +45,12 @@ Here is a checklist for how to compile the libraries locally. We tend to use Win
 * Go make a cup of tea. It takes a while...
 * When the build is complete, you will find ```libbt.a``` and four ```libmbed.a``` files in your folder
 * If you are compiling the [RTK Everywhere Firmware](https://docs.sparkfun.com/SparkFun_RTK_Everywhere_Firmware/firmware_compile/) locally, copy these five files into ```SparkFun_RTK_Everywhere_Firmware\Firmware\RTK_Everywhere\Patch```
+* If you want to take a look at the Lib Builder source files, you can do this by opening a bash shell in a container for the arduino_lib_builder image:
+    * Ensure Docker Desktop is running
+    * ```docker run --rm -it -e TERM=xterm-256color arduino_lib_builder:latest /bin/bash```
+    * (This replaces the ```CMD echo $(ls /*.*)``` at the end of the Dockerfile with ```CMD /bin/bash``` and opens a bash shell)
+    * The source files are in ```opt/esp/lib-builder```
+    * ```exit``` to leave the bash shell
 
 ### Building with GitHub Actions
 
