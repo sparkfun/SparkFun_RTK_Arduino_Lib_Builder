@@ -86,12 +86,12 @@ RUN cd $LIBBUILDER_PATH \
 
 FROM upstream AS deployment
 
-ADD . .
-
 # Replace esp_mem.c to allow memory allocation in PSRAM
+ADD esp_mem.c esp_mem.c
 COPY esp_mem.c $LIBBUILDER_PATH/esp-idf/components/mbedtls/port/esp_mem.c
 
 # Replace defconfig.esp32 to add support for BT SDP
+ADD defconfig.esp32 defconfig.esp32
 COPY defconfig.esp32 $LIBBUILDER_PATH/configs/defconfig.esp32
 
 # Replace ARRAY_TO_BE_STREAM with ARRAY_TO_BE_STREAM_REVERSE in add_raw_sdp in btc_sdp.c
@@ -100,8 +100,8 @@ RUN sed -i 's|ARRAY_TO_BE_STREAM|ARRAY_TO_BE_STREAM_REVERSE|g' \
 
 # Fix the compilation error in esp32-hal-cpu.c
 RUN sed -i 's|void esp_timer_impl_update_apb_freq|//void esp_timer_impl_update_apb_freq|g' \
-  $LIBBUILDER_PATH/components/arduino/cores/esp32/esp32-hal-cpu.c
-RUN sed -i 's|esp_timer_impl_update_apb_freq(apb|//esp_timer_impl_update_apb_freq(apb|g' \
+  $LIBBUILDER_PATH/components/arduino/cores/esp32/esp32-hal-cpu.c \
+  && sed -i 's|esp_timer_impl_update_apb_freq(apb|//esp_timer_impl_update_apb_freq(apb|g' \
   $LIBBUILDER_PATH/components/arduino/cores/esp32/esp32-hal-cpu.c
 
 # Re-build for ESP32 using the modified files. Always "exit 0" - even if compilation fails
