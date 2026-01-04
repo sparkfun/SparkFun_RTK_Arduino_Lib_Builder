@@ -20,7 +20,7 @@ While we were adding support for SDP, we noticed that the advertised 128-bit iAP
 
 ## IDF Version
 
-The RTK Firmware currently uses version v3.0.7 of the [arduino-esp32 core](https://github.com/espressif/arduino-esp32). This is based on ESP-IDF v5.1 (specifically v5.1.4+). The later versions of the core, from v3.1.0 onwards, consume more RAM and we run into problems when we have Bluetooth Classic+BLE and WiFi enabled simultaneously. So, for now, we are sticking with v3.0.7 and IDF v5.1. The customised libraries compiled here are based on IDF v5.1.
+The RTK Firmware currently uses version v3.0.7 of the [arduino-esp32 core](https://github.com/espressif/arduino-esp32). This is based on ESP-IDF v5.1 (specifically v5.1.4+, commit 632e0c2a). The later versions of the core, from v3.1.0 onwards, consume more RAM and we run into problems when we have Bluetooth Classic+BLE and WiFi enabled simultaneously. So, for now, we are sticking with v3.0.7 and IDF v5.1. The customised libraries compiled here are based on IDF v5.1.
 
 ## Building
 
