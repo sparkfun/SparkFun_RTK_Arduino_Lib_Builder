@@ -14,7 +14,7 @@ SparkFun's RTK Everywhere Firmware runs on ESP32 and makes extensive use of Espr
 
 ### libbt
 
-```libbt``` contains the Bluetooth stack for ESP32. It is fantastic and works very well. To support Apple Accessory on Bluetooth Classic, we need SDP (Service Discovery Protocol) to be enabled. The Espressif IDF makes this possible through ```CONFIG_BT_SDP_COMMON_ENABLED```. But with the standard, pre-compiled Arduino library, SDP is disabled. We need to re-compile ```libbt``` with SDP enabled, using a customised version of ```defconfig.esp32```.
+```libbt``` contains the Bluetooth stack for ESP32. It is fantastic and works very well. To support Apple Accessory on Bluetooth Classic, we need L2CAP (Logical Link Control and Adaptation Protocol) and SDP (Service Discovery Protocol) to be enabled. The Espressif IDF makes this possible through ```CONFIG_BT_L2CAP_ENABLED``` and ```CONFIG_BT_SDP_COMMON_ENABLED```. But with the standard, pre-compiled Arduino library, both are disabled. We need to re-compile ```libbt``` with L2CAP and SDP enabled, using a customised version of ```defconfig.esp32```.
 
 While we were adding support for SDP, we noticed that the advertised 128-bit iAP2 UUID byte order was reversed. The best fix we could find was to replace ```ARRAY_TO_BE_STREAM``` with ```ARRAY_TO_BE_STREAM_REVERSE``` in ```add_raw_sdp``` in ```btc_sdp.c```. We include that change when we re-compile.
 
